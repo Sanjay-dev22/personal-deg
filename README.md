@@ -6,12 +6,16 @@ Policy as Code (UC3), Vehicle-to-Grid, and Peer-to-Peer Energy Trading.
 
 ## Contents
 
-**`portfolio-deck/`** — an overview presentation spanning all three
-explorations, in two forms:
-- `DEG-IES-Story-v2.pptx` — the fuller, 21-slide version (proper multi-slide
-  DEG/IES intro, one slide per section per topic)
-- `DEG-IES-Story-Compact.pptx` — a shorter 7-slide version, condensed intro,
-  one slide per exploration
+**`portfolio-deck/`** — overview presentations spanning the DEG/IES work:
+- `DEG-IES-Master-Portfolio.pptx` — the current, most complete version: a
+  full background (what DEG/IES/Beckn are, how the protocol works) plus a
+  detailed investigations section for UC3 (Policy as Code, including a real
+  before/after schema diff) and P2P Energy Trading (with live-app
+  screenshots and a Grid Pulse walkthrough)
+- `DEG-IES-Story-v2.pptx` — an earlier fuller, 21-slide version (proper
+  multi-slide DEG/IES intro, one slide per section per topic)
+- `DEG-IES-Story-Compact.pptx` — an earlier shorter 7-slide version,
+  condensed intro, one slide per exploration
 
 **`grid-pulse/`** — a self-contained, clickable walkthrough of the real P2P
 energy trade, for an audience that won't sit through a live click-through
