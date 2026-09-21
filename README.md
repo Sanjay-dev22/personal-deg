@@ -41,3 +41,9 @@ map jumps to any moment, in any order):
 - `ISO-15118-20-Layer-B-Deep-Dive.pptx` — a technical deep-dive on the
   vehicle↔charger protocol layer, requested for a more technical review
 - `DEMO-SCRIPT.md`, `v2g-case.md` — supporting write-ups behind the above
+
+**`intro-slides/`** — one-slide self-introductions for a department meeting:
+- `Intro-Slide-Student.pptx` — follows the department's sample template
+  (name, role, programme, skill chips, about me, journey)
+- `Intro-Slide-Bosch.pptx` — a from-scratch alternative layout: identity panel
+  plus a short education / skills / beyond-code story
