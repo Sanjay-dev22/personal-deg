@@ -47,3 +47,12 @@ map jumps to any moment, in any order):
   (name, role, programme, skill chips, about me, journey)
 - `Intro-Slide-Bosch.pptx` — a from-scratch alternative layout: identity panel
   plus a short education / skills / beyond-code story
+
+**`aggregation-v2g/`** — a 30-slide research deck on aggregation, orchestration
+and vehicle-to-grid, prepared after a demo review:
+- `Aggregation-Orchestration-V2G.pptx` — who's who (regulators, utilities,
+  aggregators, standards), how many small resources become one dependable
+  supply (with and without V2G), how it fits DEG / IES, the risks raised in
+  the review, what exists in India and at Bosch publicly, and a proposal.
+  Every claim is labelled verified, reported, inference or proposed, with
+  sources listed at the end
