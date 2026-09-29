@@ -49,10 +49,20 @@ map jumps to any moment, in any order):
   plus a short education / skills / beyond-code story
 
 **`aggregation-v2g/`** — a 30-slide research deck on aggregation, orchestration
-and vehicle-to-grid, prepared after a demo review:
+and vehicle-to-grid, prepared after a demo review, plus the deeper research
+behind it:
 - `Aggregation-Orchestration-V2G.pptx` — who's who (regulators, utilities,
   aggregators, standards), how many small resources become one dependable
   supply (with and without V2G), how it fits DEG / IES, the risks raised in
   the review, what exists in India and at Bosch publicly, and a proposal.
   Every claim is labelled verified, reported, inference or proposed, with
   sources listed at the end
+- `research-bosch-v2g-der-deep-dive.md` — the full underlying research
+  record: worldwide V2G pilots (Denmark, Delaware, Netherlands, Japan, UK,
+  US school buses/California) and DER/VPP-without-V2G precedent (Tesla's
+  South Australia VPP, Kaluza, Next Kraftwerke, sonnen, AutoGrid/Uplight)
+  with real technical/commercial detail; why India hasn't replicated it;
+  Bosch's actual product portfolio mapped layer-by-layer against the
+  stack, including the discovery that Bosch built and ran a real VPP
+  control-room product once (Grid Optimization Manager) and let it lapse;
+  revenue models; and concrete fundable pitch angles
