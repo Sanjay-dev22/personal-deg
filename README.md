@@ -66,3 +66,12 @@ behind it:
   stack, including the discovery that Bosch built and ran a real VPP
   control-room product once (Grid Optimization Manager) and let it lapse;
   revenue models; and concrete fundable pitch angles
+
+**`uc3-submission/`** — the personal planning notes behind the UC3
+(Policy as Code) schema proposal to IES:
+- `FORM-ANSWERS.md` — the paste-ready text for IES's "Propose a Schema"
+  form, and the personal decision checklist that goes with it (name/org
+  to use, repo visibility, commit-author email, the superseded
+  `myprotoiec` repo). The proposal repository itself is
+  `github.com/Sanjay-dev22/ies-uc3-policy-as-code`, kept separate and
+  public on its own
