@@ -81,3 +81,12 @@ behind it:
   `myprotoiec` repo). The proposal repository itself is
   `github.com/Sanjay-dev22/ies-uc3-policy-as-code`, kept separate and
   public on its own
+- `DEFENSE-PREP.md` — a rehearsal sheet for defending the proposal in
+  review: what to say if the writing is challenged as AI-generated, a
+  section-by-section plain-language script for `PROPOSAL.md` and both
+  READMEs, answers for a non-technical questioner, the numbers to have
+  memorized cold, the two open calculation questions worked through with
+  simple numbers and analogies, every field in the raw tariff verified
+  fresh against the live official source, and an honest answer on what's
+  actually verifiable about whether IES built this idea themselves or
+  only documented the direction
