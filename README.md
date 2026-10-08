@@ -73,6 +73,27 @@ behind it:
   control-room product once (Grid Optimization Manager) and let it lapse;
   revenue models; and concrete fundable pitch angles
 
+**`p2p-energy-trading-review/`** — a full technical study and feasibility
+review of the P2P Energy Trading use case, prepared for a team review with
+both technical and non-technical attendees:
+- `P2P-Energy-Trading-Study.pptx` — the full walkthrough: why the use case
+  exists, who the real BAP/BPP/Ledger Provider roles actually are, why it
+  isn't a crypto exchange, what's genuinely built in the real devkit today,
+  the full gap inventory with severity ratings, direct quotes from the
+  program's own status page, and a feasibility verdict with prioritized
+  open questions for the team
+- `P2P-Energy-Trading-Software-Gaps.pptx` — a dedicated deep-dive on the
+  12 identified software gaps, built after re-verifying every one of them
+  against the real, running devkit (Docker stack brought up locally, real
+  trades sent through its actual signed/policy-enforced pipeline, not just
+  a re-read of the code). Covers the conformance re-check result (zero
+  false alarms), two genuine surprises a live run caught that a static
+  read hadn't (a stale policy URL in the devkit's own README, and a real
+  ₹0.01/kWh trade proven to clear every check with no price-sanity
+  rejection), and a prioritized fix list. The full written feasibility
+  study and gap-by-gap markdown live in the separate
+  `github.com/Sanjay-dev22/p2p-grid-feasibility` repo
+
 **`uc3-submission/`** — the personal planning notes behind the UC3
 (Policy as Code) schema proposal to IES:
 - `FORM-ANSWERS.md` — the paste-ready text for IES's "Propose a Schema"
