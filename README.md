@@ -86,13 +86,17 @@ both technical and non-technical attendees:
   12 identified software gaps, built after re-verifying every one of them
   against the real, running devkit (Docker stack brought up locally, real
   trades sent through its actual signed/policy-enforced pipeline, not just
-  a re-read of the code). Covers the conformance re-check result (zero
-  false alarms), two genuine surprises a live run caught that a static
-  read hadn't (a stale policy URL in the devkit's own README, and a real
-  ₹0.01/kWh trade proven to clear every check with no price-sanity
-  rejection), and a prioritized fix list. The full written feasibility
-  study and gap-by-gap markdown live in the separate
-  `github.com/Sanjay-dev22/p2p-grid-feasibility` repo
+  a re-read of the code). One full slide per gap: the plain-language
+  problem, the concrete conceptual fix, and an honest implementation-
+  feasibility call (EASY / MEDIUM / HARD, with what it actually requires —
+  pure code, an external DISCOM data source, or a multi-party governance
+  decision), plus a 12-row feasibility-at-a-glance summary table. Also
+  covers the conformance re-check result (zero false alarms), two genuine
+  surprises a live run caught that a static read hadn't (a stale policy
+  URL in the devkit's own README, and a real ₹0.01/kWh trade proven to
+  clear every check with no price-sanity rejection), and a prioritized fix
+  list. The full written feasibility study and gap-by-gap markdown live in
+  the separate `github.com/Sanjay-dev22/p2p-grid-feasibility` repo
 
 **`uc3-submission/`** — the personal planning notes behind the UC3
 (Policy as Code) schema proposal to IES:
