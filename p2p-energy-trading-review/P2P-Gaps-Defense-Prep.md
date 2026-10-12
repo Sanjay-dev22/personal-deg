@@ -210,6 +210,43 @@ untested assumption. Two separate ledgers already run successfully in the
 local stack right now, proving the fix requires no new capability, only the
 rollout decision to actually require it before production sign-off.
 
+**Real-world precedent — this isn't hypothetical, it already happened:**
+
+- **C-Edge Technologies ransomware attack, 29 Jul – 1 Aug 2024.** Roughly
+  300 small and cooperative banks and Regional Rural Banks across India all
+  routed their UPI, NEFT and ATM services through one shared backend
+  vendor, C-Edge, instead of each running their own — the exact pattern
+  this gap describes. When C-Edge was hit by ransomware, NPCI had to sever
+  it from the network entirely to contain the damage, and every one of
+  those ~300 banks lost UPI/NEFT/ATM service simultaneously, for several
+  days — through no fault of their own, purely because they shared one
+  provider ([MediaNama](https://www.medianama.com/2024/08/223-npci-blocks-c-edge-ransomware-attack-local-banks-impacted/),
+  [The Week](https://www.theweek.in/wire-updates/business/2024/08/01/del145-biz-ransomware-ld-banks.html)).
+- **NPCI's own central UPI switch, Mar–Apr 2025.** No attack this time —
+  ordinary technical failure — and still, the single shared switch every
+  bank's UPI depends on took the entire country's transactions down
+  **three separate times in under a month** (26 Mar, 2 Apr, 12 Apr),
+  stopping PhonePe, Google Pay and Paytm alike at once, because they all
+  sit behind the same one switch
+  ([YourStory](https://yourstory.com/2025/04/upi-faces-third-outage-india)).
+- **Visa, 1 Jun 2018**, as an international cross-check that this isn't an
+  India-only pattern: Visa Europe runs two data centres specifically for
+  redundancy, and a single switch fault still took the network down for
+  hours because the failover didn't engage as designed — 5.2 million of
+  51.2 million European transactions failed
+  ([Data Center Knowledge](https://datacenterknowledge.com/uptime/visa-s-uk-network-outage-what-you-need-know)).
+  Worth having ready for "but we'd build in a backup": redundancy only
+  helps if the failover is actually operated and tested, not just present.
+
+**The line to use if this still isn't landing:** this project's own pitch
+already says "this works like UPI." Take that seriously both ways — UPI's
+one shared switch has gone down three times in a single month, and 300 real
+banks lost service for days last year because they shared one vendor
+instead of each running their own. This isn't a hypothetical risk being
+raised for its own sake. It's the fix for a failure mode that has already
+happened, repeatedly and recently, on the exact system this project
+compares itself to.
+
 **Reality check:** HARD — but hard in the organizational sense, not the
 technical one. The capability already works; what's missing is each DISCOM
 actually provisioning, operating, and funding its own instance. This is a
