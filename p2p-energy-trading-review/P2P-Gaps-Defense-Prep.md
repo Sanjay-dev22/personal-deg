@@ -942,21 +942,29 @@ infrastructure.
 
 | # | Gap | Severity | Feasibility | Status |
 |---|---|---|---|---|
-| 17 | Retried callback could double-settle | HIGH | EASY–MEDIUM | Unverified — needs code check |
+| 17 | Retried callback could double-settle | LOW (narrowed) | EASY | **Verified** — real path already guarded; local-app guard still missing, cosmetic only |
 | 18 | Policy change takes up to 24h to propagate | MEDIUM | MEDIUM | Confirmed (cache design known) |
-| 19 | Undefined behavior if policy/registry unreachable | HIGH | EASY | Unverified — needs live test |
-| 20 | No checked replay-window on signed messages | MEDIUM | EASY–MEDIUM | Unverified — needs code check |
-| 21 | Price-band may wrongly reject legitimate negative price | MEDIUM | EASY | Unverified — needs live test |
+| 19 | Undefined behavior if policy/registry unreachable | HIGH (narrowed to on_status) | EASY | **Verified** — fail-closed everywhere it matters except final settlement, which fails silent by design |
+| 20 | No checked replay-window on signed messages | — | — | **Verified NOT a gap** — real `created`/`expires` enforcement already exists, zero tolerance on expiry |
+| 21 | Price-band rejects legitimate negative price | MEDIUM | EASY | **Verified** — proven in source, hardcoded positive-only floor, no exception path |
 | 22 | No correction transaction after a dispute resolves | MEDIUM | MEDIUM | Confirmed (no such type exists) |
 | 23 | Production endpoint trust never tested between real strangers | HIGH | HARD | Confirmed (sandbox-only mechanism) |
-| 24 | Local policy-URL override may survive into production | HIGH | EASY | Unverified — needs config check |
+| 24 | Local policy-URL override may survive into production | HIGH | EASY | **Verified** — override is live in the current config right now, both prefixes side by side |
 
 **Why this list looks different from Gaps 1–16:** those were either
 found by code reading (1–12) or prompted by a reviewer's question (13–16).
 These eight came from treating the system itself as the thing to attack,
-the same posture as Gap 4's live exploit — several are marked "unverified"
-on purpose, because claiming they're real without proof would be exactly
-the kind of unearned confidence this whole exercise exists to avoid.
+the same posture as Gap 4's live exploit. Five of the eight (17, 19, 20,
+21, 24) have now actually been checked against the real running code — file
+and line numbers are cited inline, not asserted — and the honest result is
+mixed on purpose: **one (20) turned out to already be fixed**, **two (17,
+19) turned out to be real but narrower/different than first guessed**, and
+**two (21, 24) turned out to be exactly as bad as suspected, now proven
+instead of theorized**. That mix is the point — claiming all eight were
+equally real without checking would have been exactly the kind of unearned
+confidence this whole exercise exists to avoid. Gaps 18, 22, 23 are
+confirmed by direct inspection of the devkit's known design/config rather
+than requiring a live break-attempt.
 
 ---
 
