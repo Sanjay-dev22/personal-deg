@@ -651,6 +651,248 @@ combined list.
 
 ---
 
+## Gaps 17–24 — found by actively hunting, not waiting for a reviewer to ask
+
+Nobody raised these yet. They came from walking the actual running system —
+every message hop, every cache, every external dependency — and asking at
+each one: *what real-world failure lands here that we have no field, status,
+or rule for?* Several are still unverified against the real code (flagged
+explicitly below); the honest status is "found by inspection, not yet
+proven or disproven live," the same starting point Gap 4 had before it was
+turned into a live exploit.
+
+### Gap 17 — A retried async callback could settle the same trade twice
+
+**In plain terms:** Beckn messages are "answer now, real answer later" — like
+a text message that can arrive twice if the network hiccups and the sender's
+app resends it automatically. If the same "here's the final result" message
+lands twice and the software doesn't remember it already processed the
+first one, it could pay out — or charge — the same trade's money twice.
+Same bug class as a card getting charged twice because a confirmation page
+was refreshed.
+
+**The gap:** not yet confirmed whether `on_confirm`/`on_status` handlers
+check "have I already applied this exact message before" prior to running
+settlement logic — a standard idempotency check that may or may not already
+exist.
+
+**If unfixed:** a completely ordinary network retry — not fraud, not a
+broken business rule, just normal async-HTTP behavior this same protocol
+explicitly expects — could double-credit or double-debit real money.
+
+**If fixed:** every inbound webhook is keyed by `transactionId` + message id
+and checked against a seen-message table before any settlement effect runs
+a second time — the standard pattern every real payment system uses for
+this exact problem.
+
+**Reality check:** EASY–MEDIUM. First step is verification, not a fix — the
+protection may already exist; if it doesn't, it's a standard idempotency-key
+pattern, no external dependency.
+
+### Gap 18 — A regulator's rule change takes up to a day to actually apply everywhere
+
+**In plain terms:** imagine a speed limit sign gets updated at 9am, but half
+the speed cameras on the road only check the sign once every 24 hours — so
+they keep enforcing yesterday's limit until their next check. That's what
+happens here: if a regulator updates a price band or penalty floor, some
+already-running instances keep using the old number for up to a day, purely
+because of a cache timer, not a deliberate choice.
+
+**The gap:** `contractpolicyenforcer`'s ≥24h cache TTL has no
+push-invalidation — a rule change doesn't take effect network-wide the
+moment it's published.
+
+**If unfixed:** two different participants can be legitimately governed by
+two different versions of the same rule at the same moment, purely by cache
+timing — a real compliance inconsistency at real trading volume, not a
+rounding error.
+
+**If fixed:** either a short TTL on compliance-critical fields, or a cheap
+version-check the policy enforcer does before trusting its cache, so a
+published change propagates fast without refetching the whole document
+every time.
+
+**Reality check:** MEDIUM. Shortening the TTL is a unilateral config change,
+available immediately. The full version-check design needs cooperation from
+whoever runs the real DeDi side.
+
+### Gap 19 — Nobody has verified what happens if the real policy/registry service goes unreachable
+
+**In plain terms:** if the service that's supposed to tell the cashier
+"this price is allowed" stops answering the phone, does the cashier let
+every sale through anyway, or refuse every sale until the phone's back?
+Nobody has actually checked which one this system does.
+
+**The gap:** behavior on a cache-miss with the real DeDi/policy endpoint
+unreachable is undocumented and unverified — it could fail-open (accept the
+trade with no enforcement at all, dangerous) or fail-closed (reject/hold,
+safe, but an unannounced extension of Gap 2's "stuck deal" problem).
+
+**If unfixed:** the honest answer today is "we don't know" — and shipping a
+compliance gate with an unverified failure mode is itself the defect,
+independent of which way it actually turns out to behave.
+
+**If fixed:** explicit, tested, fail-closed behavior (reject or hold, never
+silently allow), paired with Gap 2's timeout/visibility mechanism so a real
+outage becomes a visible, named state instead of an invisible one.
+
+**Reality check:** EASY to verify (just test it), EASY to fix if it turns
+out wrong.
+
+### Gap 20 — No checked replay-window on signed messages
+
+**In plain terms:** if someone captured a perfectly valid, correctly-signed
+message from an hour ago and sent it again, would the system notice it's
+old, or process it like it just arrived? A valid signature only proves
+*who* signed it — not *when* it's still allowed to be used.
+
+**The gap:** not yet confirmed whether message validation checks freshness
+(a timestamp/nonce + replay window) in addition to signature integrity.
+
+**If unfixed:** a captured, still-validly-signed old `init`/`confirm` could
+potentially be resent to force a duplicate or stale commitment.
+
+**If fixed:** every signed message carries a timestamp/nonce checked against
+a short validity window and a seen-message cache — standard replay
+protection, already common practice for signed-API designs like this one.
+
+**Reality check:** EASY to verify, EASY–MEDIUM to fix if actually missing.
+
+### Gap 21 — The new price-band check may wrongly reject a legitimate negative price
+
+**In plain terms:** on a very sunny, low-demand afternoon, real power
+markets sometimes go *negative* — the seller effectively pays the buyer to
+take the electricity, because that's cheaper than shutting a plant down.
+If the rule built to "catch an obviously wrong price" (Gap 4) assumed price
+is always positive, it could reject a real, legitimate negative-price trade
+as if it were a typo — the exact opposite of what it was built to protect.
+
+**The gap:** untested whether Gap 4's price-band fix's lower bound actually
+allows a legitimate negative price when the published tariff band permits
+one, or hard-floors at zero.
+
+**If unfixed:** a real oversupply-driven negative-price trade gets rejected
+by the very mechanism meant to protect the network — same category of harm
+as Gap 12 penalizing solar for clouds.
+
+**If fixed:** the band's lower bound comes from the regulator-published
+number (which may legitimately go negative), never a hardcoded floor of
+zero.
+
+**Reality check:** EASY to verify and EASY to fix if wrong — this is a pure
+code check, no external dependency.
+
+### Gap 22 — No correction transaction once a dispute (Gap 3) actually resolves
+
+**In plain terms:** once money has already moved and is written into a
+permanent, append-only ledger, and a dispute later proves the number was
+wrong, how do you actually fix it? You can't erase an already-written
+ledger line — real accounting handles this with a new offsetting entry, not
+an edit. There's no such entry type defined here yet.
+
+**The gap:** Gap 3 adds a pointer to an external grievance case, but nothing
+defines how that case's eventual resolution gets applied back onto an
+already-settled, already-cascaded ledger record.
+
+**If unfixed:** even a correctly-resolved dispute has no way to actually
+change the money on this platform — Gap 3's fix ends at "we know the case
+number," not "the trade record now reflects reality."
+
+**If fixed:** a `SETTLEMENT_CORRECTION` transaction type, referencing the
+original `transactionId` and the resolved case number, applied as a new
+offsetting entry — mirroring both real double-entry accounting and the real
+IES ledger's own append-only design.
+
+**Reality check:** MEDIUM — straightforward design, but depends on Gap 3's
+grievance link existing and the external ledger accepting a correction-type
+entry.
+
+### Gap 23 — Production endpoint trust between two real strangers has never been tested
+
+**In plain terms:** in this demo, "the seller's address" and "the buyer's
+address" are fake street names that only resolve because both are secretly
+on the same private property with a shared map (the Caddy router) that
+knows what they really mean. Two real companies aren't on the same private
+property — they need a real, internet-reachable address, proof it's really
+them (TLS/mutual auth), and a way to update that address if it changes.
+None of that has been built or tested yet.
+
+**The gap:** BAP↔BPP routing today works via Docker network aliases on a
+shared Caddy instance — a sandbox convenience. Every successful trade so
+far has depended on infrastructure that will not exist once two genuinely
+independent operators deploy separately.
+
+**If unfixed:** this devkit has literally never been proven to work in the
+one topology that actually matters for production — two mutually unknown,
+independently-operated networks.
+
+**If fixed:** extend the real subscriber-registry lookup (already used for
+key resolution) to also be the actual routing source of truth, with each
+participant running their own public, TLS-terminated endpoint.
+
+**Firm answer to "but we already tested this, it works":** it works in the
+sandbox's shared-network configuration specifically — worth saying plainly
+that the one topology that matters for production hasn't been tested at
+all, which is a real, unclosed gap, not a nitpick.
+
+**Reality check:** HARD — not really a code gap so much as an unperformed
+integration test; the registry mechanism needed already exists for keys,
+extending it to routing is plausible but unverified.
+
+### Gap 24 — The local policy-URL override used for this very demo may still be enabled in production
+
+**In plain terms:** today, for testing, this software can be told "trust
+this specific web address as the source of truth for settlement rules" —
+useful because the real regulator-published policy URL wasn't usable yet.
+But if that same override still exists in a production build, nothing stops
+a dishonest participant from pointing their own instance at a policy file
+they wrote themselves — one that conveniently always computes numbers in
+their own favor.
+
+**The gap:** `allowedPolicyUrlPrefixes` currently permits a local/custom
+policy URL per adapter (needed for this very demo). Whether a production
+build strips this down to only real, DeDi-resolved URLs hasn't been
+confirmed.
+
+**If unfixed:** a compromised or dishonest participant's own config becomes
+the single easiest attack on the entire settlement system — simpler than
+any signature or price-band exploit, because it just replaces the rule
+itself.
+
+**If fixed:** production startup enforces that the allow-list contains only
+the real DeDi-published base URL pattern — any other entry rejected or
+flagged; the override used for this demo is explicitly documented as
+sandbox-only, never present in a production image.
+
+**Firm answer to "we obviously wouldn't ship it configured that way":**
+"obviously wouldn't" is exactly the assumption Gap 4 already disproved
+once — the only real answer is an enforced check, not an intention.
+
+**Reality check:** EASY — a config validation/lint check at startup, no new
+infrastructure.
+
+### The feasibility table for Gaps 17–24
+
+| # | Gap | Severity | Feasibility | Status |
+|---|---|---|---|---|
+| 17 | Retried callback could double-settle | HIGH | EASY–MEDIUM | Unverified — needs code check |
+| 18 | Policy change takes up to 24h to propagate | MEDIUM | MEDIUM | Confirmed (cache design known) |
+| 19 | Undefined behavior if policy/registry unreachable | HIGH | EASY | Unverified — needs live test |
+| 20 | No checked replay-window on signed messages | MEDIUM | EASY–MEDIUM | Unverified — needs code check |
+| 21 | Price-band may wrongly reject legitimate negative price | MEDIUM | EASY | Unverified — needs live test |
+| 22 | No correction transaction after a dispute resolves | MEDIUM | MEDIUM | Confirmed (no such type exists) |
+| 23 | Production endpoint trust never tested between real strangers | HIGH | HARD | Confirmed (sandbox-only mechanism) |
+| 24 | Local policy-URL override may survive into production | HIGH | EASY | Unverified — needs config check |
+
+**Why this list looks different from Gaps 1–16:** those were either
+found by code reading (1–12) or prompted by a reviewer's question (13–16).
+These eight came from treating the system itself as the thing to attack,
+the same posture as Gap 4's live exploit — several are marked "unverified"
+on purpose, because claiming they're real without proof would be exactly
+the kind of unearned confidence this whole exercise exists to avoid.
+
+---
+
 ## The feasibility table, to close any "just do all of it at once" pushback
 
 | # | Gap | Severity | Feasibility | What it actually needs |
