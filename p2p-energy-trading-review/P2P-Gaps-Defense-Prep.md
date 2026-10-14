@@ -895,7 +895,7 @@ all, which is a real, unclosed gap, not a nitpick.
 integration test; the registry mechanism needed already exists for keys,
 extending it to routing is plausible but unverified.
 
-### Gap 24 — The local policy-URL override used for this very demo may still be enabled in production
+### Gap 24 — The local policy-URL override used for this very demo may still be enabled in production — VERIFIED: the override is real and live right now
 
 **In plain terms:** today, for testing, this software can be told "trust
 this specific web address as the source of truth for settlement rules" —
@@ -905,10 +905,21 @@ a dishonest participant from pointing their own instance at a policy file
 they wrote themselves — one that conveniently always computes numbers in
 their own favor.
 
+**What was actually checked, with receipts:** every `allowedPolicyUrlPrefixes`
+entry in the currently-running config (`local-p2p-trading-sellerapp.yaml:94,
+207, 316, 424`) reads exactly:
+`"https://api.dedi.global/dedi/lookup/indiaenergystack.in,http://host.docker.internal:8099"`
+— the real DeDi prefix **and** this machine's own local file-server
+prefix, side by side, in every single module. This isn't a theoretical
+capability; it's the literal, live config this demo is running on right
+now. The capability is real, confirmed, not inferred.
+
 **The gap:** `allowedPolicyUrlPrefixes` currently permits a local/custom
-policy URL per adapter (needed for this very demo). Whether a production
-build strips this down to only real, DeDi-resolved URLs hasn't been
-confirmed.
+policy URL per adapter (needed for this very demo, and proven present
+above). Whether a production build strips this down to only real,
+DeDi-resolved URLs hasn't been confirmed — there is no code-level guard
+that would stop someone from shipping this exact config, local override and
+all, to production.
 
 **If unfixed:** a compromised or dishonest participant's own config becomes
 the single easiest attack on the entire settlement system — simpler than
