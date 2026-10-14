@@ -731,28 +731,51 @@ every time.
 available immediately. The full version-check design needs cooperation from
 whoever runs the real DeDi side.
 
-### Gap 19 — Nobody has verified what happens if the real policy/registry service goes unreachable
+### Gap 19 — What happens if the real policy service goes unreachable — VERIFIED: fail-closed where it counts, but a real silent gap at final settlement
 
 **In plain terms:** if the service that's supposed to tell the cashier
 "this price is allowed" stops answering the phone, does the cashier let
 every sale through anyway, or refuse every sale until the phone's back?
-Nobody has actually checked which one this system does.
+Checked directly in the code: for the moments that decide whether a trade
+even happens (listing it, requesting it, confirming it), the system
+correctly refuses the sale. But for the one moment that decides how much
+money actually changes hands — final settlement — it does the opposite on
+purpose, and nobody is told.
 
-**The gap:** behavior on a cache-miss with the real DeDi/policy endpoint
-unreachable is undocumented and unverified — it could fail-open (accept the
-trade with no enforcement at all, dangerous) or fail-closed (reject/hold,
-safe, but an unannounced extension of Gap 2's "stuck deal" problem).
+**What was actually checked, with receipts:**
 
-**If unfixed:** the honest answer today is "we don't know" — and shipping a
-compliance gate with an unverified failure mode is itself the defect,
-independent of which way it actually turns out to behave.
+- `contractpolicyenforcer.go:137-145` — on every *enforced* action, a failed
+  policy fetch/compile/eval returns a typed error explicitly labeled
+  **"fail-closed"** in the code's own comment, which the pipeline turns into
+  a NACK. This is correct and already verified working.
+- `config/local-p2p-trading-sellerapp.yaml:85-86` confirms `select, init,
+  confirm` (and `publish`, line 308) are the enforced actions — exactly the
+  moments a bad or unreachable policy should be able to stop a trade from
+  forming. **Confirmed safe.**
+- But the same config (`:110`, `:198-199`, `:308`) and the plugin's own file
+  header (`contractpolicyenforcer.go:20-22`, *"soft failure everywhere
+  else"*) show **`on_status` is deliberately injection-only**
+  (`violationActions: ""`) — by explicit design, documented in the config
+  comment itself: *"on_status stays injection-only with violations
+  logged."* If the real policy/DeDi endpoint is unreachable at the exact
+  moment final settlement happens, the callback is **never NACKed** — it
+  completes, with **no revenue flows injected at all**: no penalty, no
+  wheeling charge, nothing, logged only as a warning nobody is watching.
 
-**If fixed:** explicit, tested, fail-closed behavior (reject or hold, never
-silently allow), paired with Gap 2's timeout/visibility mechanism so a real
-outage becomes a visible, named state instead of an invisible one.
+**If unfixed:** a policy outage timed to hit exactly at settlement produces
+a trade that looks *completed*, not stuck — which is actually worse than
+Gap 2's "stuck forever" failure mode, because nothing ever flags it as
+incomplete. A completed-but-unpriced trade is silently invisible in a way a
+stuck one at least isn't.
 
-**Reality check:** EASY to verify (just test it), EASY to fix if it turns
-out wrong.
+**If fixed:** `on_status` should fail toward a named, visible state (e.g.
+`SETTLEMENT_PENDING_POLICY_RETRY`) rather than completing silently with
+empty settlement data — reusing Gap 2's same "make a silent failure visible"
+mechanism, just triggered by this specific cause.
+
+**Reality check:** EASY to fix once scoped — this is a precise, now-proven
+gap (file and line numbers above), not a hypothesis. The fix is a config/
+behavior change to one action's failure path, no new infrastructure.
 
 ### Gap 20 — No checked replay-window on signed messages
 
