@@ -459,6 +459,198 @@ that battery/V2G systems already report today.
 
 ---
 
+## Gaps 13–16 — raised live in a review, checked against real grid physics and market practice, not guessed at
+
+A separate round of questions came up in review, phrased informally: "what if
+there's a grid/equipment failure," "what if the customer just switches their
+solar off," "what if they deliver power faster than promised," "what about a
+thing that watches both smart meters constantly," and "what about an
+aggregator that pools small offers for big buyers." None of these were
+treated as rhetorical — each was checked against real electrical-engineering
+and market-design concepts that already exist in the real world, to find out
+whether it's a genuine gap, already-covered ground, or a non-issue.
+
+**Two of the five turned out to already be on this list.** Grid/equipment
+failure causing a shortfall is **Gap 9**, already above — a verified outage
+waives the penalty, an unverifiable fault is capped, nothing new to add.
+Getting paid extra for delivering faster is **Gap 11**, already above. Being
+treated differently for an honest forecast versus a hard commitment is
+**Gap 12**, already above. That's not a dodge — it's the strongest possible
+answer to give live: "already identified, already designed, see Gap 9/11/12."
+
+**The other three/four are real and genuinely new.** None of them are
+fictional — each maps to an established, named real-world engineering or
+market category. They're written up below the same way as Gaps 1–12.
+
+### Gap 13 — "The customer switched off their own solar" isn't one thing, it's two, and only one is punishable
+
+**In plain terms:** Sometimes a rooftop owner just doesn't feel like
+exporting — that's their right, nobody can force a private citizen's solar
+panel to send power out. But sometimes the power company itself tells them
+to stop or reduce, because the local line already has too much power on it
+at that moment (too sunny, not enough demand, voltage creeping too high) —
+like a store manager telling cashiers to stop opening more checkout counters
+because the ones open are already more than enough. The first case is the
+seller's choice and should cost them. The second is the seller doing exactly
+what they were told, and punishing them for it is backwards.
+
+**The gap:** Gap 9 already separates genuine equipment fault / grid outage
+from plain non-delivery. It has no third category for **"a DISCOM
+deliberately instructed curtailment for grid-stability reasons"** — voltage
+rise or reverse power flow on a high-solar feeder is a real, increasingly
+common, already-documented operational event in India as rooftop solar
+penetration grows, not a hypothetical.
+
+**If this stays unfixed:** a seller who curtails on direct DISCOM
+instruction — the responsible, cooperative thing to do — is fined exactly
+like one who simply reneged, which punishes correct behavior and
+discourages sellers from honoring grid-stability instructions promptly.
+
+**If fixed:** a third status, `CURTAILMENT_INSTRUCTED`, auto-verified against
+the DISCOM's own dispatch/curtailment-instruction log (never self-reported,
+same trust model as Gap 9's `GRID_OUTAGE`), waives the extra penalty exactly
+like a verified outage does.
+
+**Reality check:** EASY–MEDIUM. Same shape, same dependency as Gap 9 —
+pure extension of an already-accepted design, contingent on the DISCOM's own
+curtailment-instruction log being reachable.
+
+### Gap 14 — Nothing stops a seller physically injecting more than the line can safely take
+
+**In plain terms:** A water pipe is built to carry a certain amount of water
+safely — push a lot more through it suddenly and it can burst, no matter how
+good "more water" sounds. Electricity lines and transformers have the same
+kind of safe limit. A seller suddenly sending much more power down the line
+than agreed isn't just "bonus delivery" — it can push voltage too high and
+trip safety switches on a neighbor's equipment, or in large numbers,
+destabilize the local grid. Gap 11 already handles the *money* side of
+delivering faster; this is the *physical safety* side, which pricing rules
+don't touch at all.
+
+**The gap:** distribution feeders and transformers have real thermal and
+voltage limits — in the industry these are called **hosting capacity** /
+**export limits** — and they exist independently of whatever two
+counterparties commercially agreed. There is no technical ceiling in this
+system capping how far a seller can exceed their committed quantity before
+it becomes a grid-safety issue rather than a pricing opportunity.
+
+**If this stays unfixed:** a commercially "generous" overdelivery can be a
+real physical hazard the software has no way to even notice, let alone stop
+— this is exactly the live problem high-solar-penetration grids are already
+fighting worldwide (California's duck-curve curtailment rules, Australia's
+mandated dynamic export limits).
+
+**If fixed:** a hard max-export ceiling, set by the DISCOM at the
+interconnection point (same concept as a real inverter's export-limit
+setting), enforced independently of the trade's commercial terms —
+overdelivery past that ceiling gets rejected/flagged at the metering layer,
+never just priced as a bonus.
+
+**Reality check:** HARD — the same reason as Gap 8: the fix isn't the
+software inventing grid physics, it's refusing to proceed without a real
+export-limit value from the DISCOM's own interconnection record. This is
+effectively a narrower, specific case of Gap 8.
+
+### Gap 15 — The "constantly watching the meters" idea already exists; the gap is that settlement never looks at it live
+
+**In plain terms:** Right now the system mostly learns what really happened
+only at the end of a delivery window — like checking a car's fuel gauge once
+a month instead of glancing at it while driving. Real smart meters can
+already report much more often than that; India's own smart-meter rollout is
+built on exactly this capability. The real opportunity isn't inventing a new
+meter-watching gadget — that part's solved — it's getting the *trading
+software* to actually look at that live feed instead of waiting for the
+end-of-window batch file.
+
+**The gap:** AMI (Advanced Metering Infrastructure) with a Head-End System
+already delivers near-real-time telemetry in deployed Indian smart-meter
+rollouts. This devkit's settlement and dispute logic (Gaps 3, 10) is built
+entirely around an end-of-window `FINAL_ALLOC` figure, with no path for
+interval-level data to reach it earlier.
+
+**If this stays unfixed:** every deviation — shortfall, overdelivery, a
+Gap 13/14 event — is only discovered after the fact, at settlement, instead
+of while it's still happening and actionable.
+
+**If fixed:** the platform subscribes to each DISCOM's own HES feed and
+surfaces interval-level deviation as it happens, catching problems within the
+delivery window instead of after it closes.
+
+**Firm answer to "isn't this just more hardware to buy":** no — the hardware
+and the real-time data already exist in deployed smart meters today; this is
+a software integration and data-governance gap, not a hardware gap.
+
+**Reality check:** MEDIUM–HARD. Not a research problem — a systems-
+integration problem (every DISCOM's HES is a different vendor/data model)
+plus a real data-governance constraint: granular real-time per-household
+energy data is personal data under India's Digital Personal Data Protection
+Act, so access needs explicit scoping/consent, not an open firehose. Same
+dependency flavor as Gap 8 — outside this codebase's control, honestly
+scoped as integration work, not a code defect.
+
+### Gap 16 — There's no role for pooling many small offers into one tradeable block
+
+**In plain terms:** One rooftop solar system might only produce a few
+kilowatts — too small for a big industrial buyer or the wholesale power
+market to bother dealing with directly, the same way a supermarket chain
+doesn't negotiate with one single vegetable farmer; it buys through a
+distributor who pools many small farms into one reliable, large-enough
+supply. An "aggregator" is the electricity version of that distributor:
+bundling thousands of small, individually-unreliable offers into one larger,
+statistically-reliable block a big buyer can actually transact with.
+
+**The gap:** this is not a fictional concept — it is an already-mainstream,
+heavily-funded real industry category (**Virtual Power Plants / DER
+aggregators** — Tesla's VPP, Octopus Energy's Kraken, Enel X), and Indian
+regulation already anticipates an aggregator role (CERC/Ministry of Power
+demand-response and Green Open Access provisions). This devkit has no
+standing participant role between many small BPPs and one large buyer at
+all today.
+
+**If this stays unfixed:** small prosumers stay permanently excluded from
+any market that requires a meaningful minimum trade size — which is most
+real wholesale and balancing markets — because individually they're each too
+small to matter to a large buyer, and nothing in this system combines them.
+
+**If fixed:** a new standing network role sits between many small sellers
+and one large buyer, doing four real things: (1) pooling available offers
+with an uncertainty discount for the smaller, less predictable ones, (2)
+re-aggregating near-real-time as individual contributions change (depends
+directly on Gap 15's telemetry), (3) disaggregating the pooled trade's
+settlement back down to each original contributor proportionally — a real,
+solved problem in the VPP/demand-response world ("baseline and performance
+allocation" methodologies), and (4) registering as its own participant type
+in the Beckn network, distinct from BAP/BPP.
+
+**Firm answer to "is this really worth building, or just a nice-to-have":**
+this is arguably the single most commercially significant idea raised in the
+whole review — it's the exact mechanism that turns a two-app P2P demo into
+something resembling the real DER-aggregation business models the industry
+is actively investing in right now, and it's the only way small prosumers
+ever reach a large buyer at all.
+
+**Reality check:** HARD, and a roadmap-level item, not a quick fix — real
+engineering substance (steps 1–3 above), not a missing checkbox.
+
+### The feasibility table for Gaps 13–16
+
+| # | Gap | Severity | Feasibility | What it actually needs |
+|---|---|---|---|---|
+| 13 | Voluntary vs. DISCOM-instructed curtailment not distinguished | MEDIUM | EASY–MEDIUM | Code + DISCOM curtailment-instruction log |
+| 14 | No physical export ceiling independent of commercial quantity | HIGH | HARD | Code + live DISCOM interconnection/export-limit data |
+| 15 | Settlement never sees telemetry until end-of-window | MEDIUM | MEDIUM–HARD | Integration with each DISCOM's own AMI/HES, + data-governance scoping |
+| 16 | No aggregator/VPP role to pool small offers for bulk buyers | HIGH (strategic) | HARD | New participant role + pooling/disaggregation logic + Gap 15's telemetry |
+
+**The one-line summary for this round:** three of the five questions raised
+were already answered on this list before the meeting even happened (Gaps 9,
+11, 12); the other four are real, named, already-active real-world
+engineering or market categories — none of them fictional, none of them
+"no use of real world" — and the hardest one of the four (Gap 16, the
+aggregator) is also the most commercially important thing on this entire
+combined list.
+
+---
+
 ## The feasibility table, to close any "just do all of it at once" pushback
 
 | # | Gap | Severity | Feasibility | What it actually needs |
