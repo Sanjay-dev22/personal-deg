@@ -661,7 +661,7 @@ explicitly below); the honest status is "found by inspection, not yet
 proven or disproven live," the same starting point Gap 4 had before it was
 turned into a live exploit.
 
-### Gap 17 — A retried async callback could settle the same trade twice
+### Gap 17 — A retried async callback could settle the same trade twice — VERIFIED: partially mitigated, real residual gap is narrower than it looks
 
 **In plain terms:** Beckn messages are "answer now, real answer later" — like
 a text message that can arrive twice if the network hiccups and the sender's
@@ -669,25 +669,40 @@ app resends it automatically. If the same "here's the final result" message
 lands twice and the software doesn't remember it already processed the
 first one, it could pay out — or charge — the same trade's money twice.
 Same bug class as a card getting charged twice because a confirmation page
-was refreshed.
+was refreshed. The good news, checked directly against the code: the layer
+that actually moves real recorded value externally already guards against
+this. The layer that doesn't is cosmetic, not financial.
 
-**The gap:** not yet confirmed whether `on_confirm`/`on_status` handlers
-check "have I already applied this exact message before" prior to running
-settlement logic — a standard idempotency check that may or may not already
-exist.
+**What was actually checked, with receipts:**
 
-**If unfixed:** a completely ordinary network retry — not fraud, not a
-broken business rule, just normal async-HTTP behavior this same protocol
-explicitly expects — could double-credit or double-debit real money.
+- `degledgerrecorder/mapper.go:368-371` (`generateClientReference`) builds a
+  **deterministic idempotency key** — `onix-<transactionID>-<orderItemID>` —
+  and it's genuinely wired into the outbound payload sent to the real
+  external IES ledger (`mapper.go:200`, `:448`, field `ClientReference`).
+  Same transaction retried twice sends the exact same key both times — real
+  double-settlement protection, *if* the receiving ledger enforces
+  uniqueness on it, which is the standard, expected behavior of an
+  idempotency key and is how this pattern is supposed to work everywhere.
+- `buyer-app/server.js:427` — the app's own local `on_status` webhook
+  handler is an **unguarded `UPDATE trades SET status=?, settlement_amount=?
+  ... WHERE transaction_id=?`**, with no "already settled, skip" check.
+  But because it writes deterministic values (not an increment, not an
+  append-only money row), a duplicate delivery would just re-apply the same
+  UPDATE harmlessly — the only real side effect is a duplicate `events` row
+  (`logEvent`, a cosmetic audit-log entry) and a UI refresh firing twice.
 
-**If fixed:** every inbound webhook is keyed by `transactionId` + message id
-and checked against a seen-message table before any settlement effect runs
-a second time — the standard pattern every real payment system uses for
-this exact problem.
+**The honest, narrowed gap:** the place real settlement value is actually
+recorded externally already has the right pattern wired in; what's actually
+missing is the same guard at the local app layer — not because money is at
+risk there today, but because this devkit's own local DB is meant to mirror
+reality (per `ARCHITECTURE.md` §5, `ledger_entries` is explicitly meant to
+be reconciled against the cascaded ledger copy later), and a duplicate-event
+audit trail undermines that reconciliation use case even though it doesn't
+move money.
 
-**Reality check:** EASY–MEDIUM. First step is verification, not a fix — the
-protection may already exist; if it doesn't, it's a standard idempotency-key
-pattern, no external dependency.
+**Reality check:** EASY. The external path is already right; add the same
+"skip if already SETTLED" guard to each app's own webhook handler — a few
+lines, no external dependency, purely hardening an already-correct design.
 
 ### Gap 18 — A regulator's rule change takes up to a day to actually apply everywhere
 
