@@ -777,24 +777,34 @@ mechanism, just triggered by this specific cause.
 gap (file and line numbers above), not a hypothesis. The fix is a config/
 behavior change to one action's failure path, no new infrastructure.
 
-### Gap 20 — No checked replay-window on signed messages
+### Gap 20 — Replay-window on signed messages — VERIFIED: already real, closed, not a gap
 
 **In plain terms:** if someone captured a perfectly valid, correctly-signed
 message from an hour ago and sent it again, would the system notice it's
-old, or process it like it just arrived? A valid signature only proves
-*who* signed it — not *when* it's still allowed to be used.
+old, or process it like it just arrived? Checked directly in the code: it
+already notices, and rejects it outright.
 
-**The gap:** not yet confirmed whether message validation checks freshness
-(a timestamp/nonce + replay window) in addition to signature integrity.
+**What was actually checked, with receipts:** `signvalidator.go:226-253`
+(`checkTimestampWindow`) parses the signature's own `created`/`expires`
+fields and enforces both: a configurable forward clock-skew tolerance on
+`created` (spec default ~5s, `signvalidator.go:40-45`), and **zero
+tolerance on `expires`** — any message received after its own declared
+expiry is rejected with `AUT_SIGNATURE_INVALID`
+(`signvalidator.go:244-251`), independent of whether the signature itself
+is cryptographically valid. This is genuine, already-working replay
+protection, not a hypothetical gap.
 
-**If unfixed:** a captured, still-validly-signed old `init`/`confirm` could
-potentially be resent to force a duplicate or stale commitment.
+**The one honest residual edge, correctly narrower than the original
+concern:** this closes replay *after* a message's validity window passes,
+but says nothing about an exact-duplicate resend of a message *within* its
+still-valid window — that edge case is really the same question as **Gap
+17** (is the receiving side idempotent on a duplicate), not a signature
+problem, and it's already been separately assessed there as low-severity in
+practice.
 
-**If fixed:** every signed message carries a timestamp/nonce checked against
-a short validity window and a seen-message cache — standard replay
-protection, already common practice for signed-API designs like this one.
-
-**Reality check:** EASY to verify, EASY–MEDIUM to fix if actually missing.
+**Reality check:** N/A — verified already fixed. No further action needed
+on this one; kept on the list to show the verification happened rather than
+quietly dropping it.
 
 ### Gap 21 — The new price-band check may wrongly reject a legitimate negative price
 
