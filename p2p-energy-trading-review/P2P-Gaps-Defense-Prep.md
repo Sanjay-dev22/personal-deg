@@ -806,29 +806,37 @@ practice.
 on this one; kept on the list to show the verification happened rather than
 quietly dropping it.
 
-### Gap 21 — The new price-band check may wrongly reject a legitimate negative price
+### Gap 21 — The price-band check wrongly rejects any legitimate negative price — VERIFIED: real, proven in the source
 
 **In plain terms:** on a very sunny, low-demand afternoon, real power
 markets sometimes go *negative* — the seller effectively pays the buyer to
 take the electricity, because that's cheaper than shutting a plant down.
-If the rule built to "catch an obviously wrong price" (Gap 4) assumed price
-is always positive, it could reject a real, legitimate negative-price trade
-as if it were a typo — the exact opposite of what it was built to protect.
+The rule built to "catch an obviously wrong price" (Gap 4) assumed price is
+always positive — checked directly in the policy file, it genuinely does,
+so it would reject a real, legitimate negative-price trade as if it were a
+typo. The exact opposite of what it was built to protect against.
 
-**The gap:** untested whether Gap 4's price-band fix's lower bound actually
-allows a legitimate negative price when the published tariff band permits
-one, or hard-floors at zero.
+**What was actually checked, with receipts:**
+`p2p-trading-ies-wave2-contractpolicy-local-amended.rego:249-251` declares
+`min_price_per_kwh := 6.00` as a flat constant, and the violation rule at
+`:670-677` fires unconditionally whenever `v < min_price_per_kwh` — there is
+no branch, no exception, no regulator-fed override for a legitimate
+negative-price scenario anywhere in the file. This isn't a design choice
+that happens to assume positive pricing; it's the literal absence of any
+path for a negative number to ever be valid.
 
 **If unfixed:** a real oversupply-driven negative-price trade gets rejected
 by the very mechanism meant to protect the network — same category of harm
-as Gap 12 penalizing solar for clouds.
+as Gap 12 penalizing solar for clouds, except this one is now proven, not
+theorized, exactly like Gap 4 was.
 
 **If fixed:** the band's lower bound comes from the regulator-published
-number (which may legitimately go negative), never a hardcoded floor of
-zero.
+number for that market condition (which may legitimately go negative under
+real oversupply rules), never a hardcoded floor of zero.
 
-**Reality check:** EASY to verify and EASY to fix if wrong — this is a pure
-code check, no external dependency.
+**Reality check:** EASY to fix — this is a one-constant change plus,
+ideally, sourcing the band from a real tariff reference instead of a
+hardcoded sample, exactly the same open item Gap 4 itself already flags.
 
 ### Gap 22 — No correction transaction once a dispute (Gap 3) actually resolves
 
