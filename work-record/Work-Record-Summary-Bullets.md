@@ -69,16 +69,16 @@
 - Extended the trading platform to support real negotiation: counter-offers in either direction, a decline path, full visibility into each stage of a trade in progress, and an auditable delivery-confirmation step
 - Identified and closed a data-integrity gap in available quantity tracking, which could otherwise have allowed the same listed inventory to be sold more than once — implemented real-time capacity tracking with automatic release on a declined counter-offer
 - Corrected a related issue in how ownership of a listing was determined, improving accuracy of the "my listings" view
-- Delivered the first consolidated work-record format (this document, a companion slide summary, and a full written record) for ongoing weekly reporting
+- Added real publish timestamps and fuller raw-data visibility to the dashboards, so every offer and trade genuinely shows when it happened
 
-## Week 6 (17–21 Sep) — Master overview presentation finalized; UC3 proposal reopened
+## Week 6 (17–21 Sep) — A short introduction to the department
 
-- Finalized the master overview presentation spanning all three initiatives to date, incorporating direct feedback on structure and content depth
-- Reopened the UC3 (Policy as Code / Tariff Intelligence) proposal, previously paused, for a complete rebuild toward formal submission readiness in a new, clean project structure
+- Gave the wider department a short introduction to the DEG/IES work so far; otherwise a quiet week
 
-## Week 7 (21 Sep – 6 Oct) — UC3 hardened for submission; a second trading platform built for flexible demand
+## Week 7 (21 Sep – 6 Oct) — UC3 picked back up and hardened for submission; a second trading platform built for flexible demand
 
-- Identified and corrected a billing-calculation defect in the UC3 reference implementation (slab-boundary handling), updating the worked example to the verified-correct amount
+- Gave a presentation to the wider team covering all the work so far — UC3, V2G, and P2P together — in plain, non-technical language
+- Picked the UC3 (Policy as Code / Tariff Intelligence) proposal back up after it had been paused, and identified and corrected a billing-calculation defect in the reference implementation (slab-boundary handling), updating the worked example to the verified-correct amount
 - Widened the cryptographic signature on the proposed tariff-publication format to cover the complete published record, closing a tamper-evidence gap in the original design
 - Validated the UC3 reference implementation end-to-end against the live government sandbox network, identifying and correcting two schema-reference defects in the process
 - Reviewed two independent third-party assessments of the UC3 proposal against primary source material; incorporated the findings that held up and set aside the one that did not
@@ -86,16 +86,17 @@
 - Documented eight gaps in the P2P network's commercial and operational rules, each with a concrete proposed remediation, and built a representative power-flow model of a distribution feeder to assess physical-grid feasibility
 - Delivered a full two-sided reference implementation of the flexibility-trading pattern — a utility-side and an aggregator-side platform, with a customer roster, live status tracking, and per-customer settlement allocation — validated end-to-end, including correction of a settlement-fairness defect found during testing
 
-## Week 8 (6–9 Oct) — Live validation of the P2P gap analysis; feasibility study delivered
+## Week 8 (6–9 Oct) — Live validation of the P2P gap analysis; feasibility study presented
 
 - Conducted a full live re-validation of the previously-identified gap list against the real, running trading network: ten of twelve findings were confirmed unchanged, one was confirmed exploitable in practice (a trade cleared at an implausible price with no safeguard in place), and two were found to already be better mitigated than originally assessed
-- Delivered a feasibility study and supporting presentation summarizing the validated findings and their practical significance
+- Presented the findings to the team, including several non-technical members, walking through what was confirmed and why it matters
 - Conducted external research confirming that peer-to-peer energy trading, as represented in this programme, reflects genuine international precedent rather than a theoretical concept, and reconciled the findings against a specific real-world case study
 
-## Week 9 (13–14 Oct) — Additional gaps identified; critical fixes implemented and validated live
+## Week 9 (13–14 Oct) — Additional gaps identified; critical fixes implemented, validated live, and demoed
 
 - Documented twelve additional operational and commercial gaps in the trading network, bringing the full documented set to twenty-four, supported by relevant real-world precedent for the most significant risk category
 - Implemented and validated, against the live network, fixes for the four most significant previously-identified gaps: a genuine financial penalty for under-delivery, a price-sanity band closing a previously-demonstrated pricing exploit, an exemption for genuinely weather-dependent commitments, and real cross-utility wheeling charges on both sides of a trade
+- Walked the team through a live before-and-after comparison, showing the system with and without these fixes
 - Identified the strongest candidate among the newly-documented gaps as the absence of a capability to pool many small producer offers into a single bundled offer for a large buyer — assessed as the most commercially significant opportunity identified in the review to date
 - Diagnosed and resolved an environment issue affecting the live demonstration following a routine restart, and produced a standing technical reference to support faster recovery in future
 
