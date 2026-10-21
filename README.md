@@ -97,6 +97,16 @@ both technical and non-technical attendees:
   clear every check with no price-sanity rejection), and a prioritized fix
   list. The full written feasibility study and gap-by-gap markdown live in
   the separate `github.com/Sanjay-dev22/p2p-grid-feasibility` repo
+- `DEG-IES-Market-Reality-Decision.pptx` — a sponsorship/feasibility
+  checkpoint deck prepared for a leadership decision session: scores all
+  four workstreams (UC3, V2G, P2P Trading, Nharuvi identity) honestly
+  against what's actually built vs. actually decided; maps the real P2P
+  market (stuck at pilot scale globally for a decade, but live and
+  regulator-backed in India via DERC/UPERC); names the competitor already
+  shipping three of our four workstreams in production (Pulse Energy) and
+  a peer company's same-week properly-sponsored equivalent (the Schneider
+  Electric / Networks for Humanity MoU); and closes with four questions
+  for leadership and a named set of decision options (A–D)
 
 **`uc3-submission/`** — the personal planning notes behind the UC3
 (Policy as Code) schema proposal to IES:
