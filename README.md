@@ -105,7 +105,13 @@ both technical and non-technical attendees:
   regulator-backed in India via DERC/UPERC); names the competitor already
   shipping three of our four workstreams in production (Pulse Energy) and
   a peer company's same-week properly-sponsored equivalent (the Schneider
-  Electric / Networks for Humanity MoU); and closes with four questions
+  Electric / Networks for Humanity MoU); includes a direct-verification
+  follow-up pass fetched live in a later review (six DISCOM-authorized P2P
+  trading apps confirmed with real registration flow and app-store links,
+  the official India-Energy-Stack and beckn/DEG GitHub orgs checked for
+  hidden/abandoned code, and the project's own storage/commitmentType
+  schema gap re-confirmed as still open against the live v2.0 schema
+  pulled directly from beckn/DEG); and closes with four questions
   for leadership and a named set of decision options (A–D)
 
 **`uc3-submission/`** — the personal planning notes behind the UC3
