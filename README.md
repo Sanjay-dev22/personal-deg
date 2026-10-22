@@ -113,6 +113,24 @@ both technical and non-technical attendees:
   schema gap re-confirmed as still open against the live v2.0 schema
   pulled directly from beckn/DEG); and closes with four questions
   for leadership and a named set of decision options (A–D)
+- `DEG-IES-Beckn-Live-Reality-Briefing.pptx` — an 18-slide, externally-
+  sourced market briefing, built to be read or presented cold: every slide
+  cites a direct link (a DERC/UPERC order, a press report, an official
+  DISCOM page, or a GitHub file) rather than internal project history.
+  Covers the live national P2P trade demo (REC Limited, 19 Feb 2026), the
+  DERC/UPERC regulatory orders and fees behind it, the 1,164-trade
+  scoreboard and its extension to March 2027, the real registration flow,
+  all six DISCOM-accredited trading apps with app-store links, Pulse
+  Energy's three simultaneous live programs (P2P trading, Unified Bharat
+  eCharge EV charging, demand flexibility), the Schneider Electric /
+  Networks for Humanity MoU (30 Sept 2026), both public GitHub orgs behind
+  the spec, the still-open EnergyTradeOffer v2.0 schema gap shown as raw
+  YAML, and a global P2P-trading and V2G track record check. Closes with
+  four honestly-scored directions (build a trading app, contribute to the
+  open schema, pursue V2G, or stop) tagged by real value type — money,
+  capability/standing, or neither — and the specific questions needed to
+  choose between them. Speaker notes are written as a literal, word-for-
+  word script for direct cold reading, not a reminder of talking points
 
 **`uc3-submission/`** — the personal planning notes behind the UC3
 (Policy as Code) schema proposal to IES:
