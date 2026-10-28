@@ -32,9 +32,11 @@ map jumps to any moment, in any order):
 - `Grid-Pulse-Guided-Tour.pptx` — an earlier version using real screenshots
   from the live tool instead
 
-**`work-record/`** — a running record of work done, in three formats:
-- `DEG-IES-Work-Record.pptx` — a living, one-slide-per-week/milestone deck,
-  meant to be added to over time
+**`work-record/`** — a running record of work done, in four formats:
+- `DEG-IES-Work-Record.pptx` — the detailed master: a living,
+  one-slide-per-week/milestone deck, meant to be added to over time
+- `DEG-IES-Weekly-Update-Group-Meeting.pptx` — a shorter, plainer-worded
+  calendar-week (CW 34–44) version of the same record, for group meetings
 - `Work-Record-Weekly.docx` — the same period, written out in full narrative
   detail week by week
 - `Work-Record-Summary-Bullets.md` — the same again, condensed to precise
