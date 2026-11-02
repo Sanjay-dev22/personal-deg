@@ -32,7 +32,7 @@ RULE_Y = 5989320  # footer rule
 # A slide lists the keys it uses (in the order they should be numbered) and bullets refer to them with Ref().
 # ---------------------------------------------------------------------------------------------
 SOURCES = {
-    "deg": ("beckn/DEG repository (FIDE, with IEA)", "https://github.com/beckn/DEG"),
+    "deg": ("Digital Energy Grid Vision Paper (FIDE, with IEA)", "https://energy.beckn.io/vision-paper/"),
     "ies_pilot": ("IES Accelerator: four pilot DISCOMs", "https://github.com/India-Energy-Stack/ies-accelerator"),
     "rec_demo": ("PV Magazine India: REC live P2P demo, AI Impact Summit (19 Feb 2026)",
                  "https://www.pv-magazine-india.com/2026/02/19/rec-conducts-live-demo-of-peer%E2%80%91to%E2%80%91peer-decentralized-energy-transaction-at-india-ai-impact-summit-2026/"),
@@ -41,7 +41,7 @@ SOURCES = {
     "devkits": ("beckn/DEG devkits (no V2G devkit listed)", "https://github.com/beckn/DEG/tree/main/devkits"),
     "afir": ("Bender: AFIR makes ISO 15118-20 mandatory from 1 Jan 2027", "https://www.bender.de/en/know-how/applications/emobility/alternative-fuels-infrastructure-regulation-afir-2025/"),
     "charin": ("CharIN position paper on ISO 15118 under AFIR (Apr 2026)", "https://www.charin.global/media/pages/technology/knowledge-base/06a76f7571-1777821309/20260428_position-paper-clarifying-iso-15118-implementation-under-afir.pdf"),
-    "bosch": ("Bosch Mobility: charge communication unit with ISO 15118-20 bidirectional transfer", "https://www.bosch-mobility.com/en/solutions/control-units/vehicle-charge-communication-unit/"),
+    "bosch": ("Bosch Mobility: charge communication unit with options for ISO 15118-20 and vehicle-to-x", "https://www.bosch-mobility.com/en/solutions/control-units/vehicle-charge-communication-unit/"),
     "derc": ("DERC order, Petition No. 06/2026 (BRPL/TPDDL P2P pilot)", "https://www.derc.gov.in/sites/default/files/Order%20in%20Petition%20No.%2006_2026.pdf"),
     "ferc": ("FERC Order No. 2222 explainer (DER aggregation, US)", "https://www.ferc.gov/ferc-order-no-2222-explainer-facilitating-participation-electricity-markets-distributed-energy"),
     "piclo": ("Piclo Flex: UK network flexibility marketplace (Northern Powergrid)", "https://www.piclo.energy/press-releases/piclo-and-northern-powergrid-join-forces-to-accelerate-the-decarbonisation-of-the-grid"),
@@ -53,8 +53,7 @@ SOURCES = {
     "kerc": ("Mercom: Karnataka notifies demand flexibility and DSM framework", "https://mercomindia.com/karnataka-notifies-framework-for-demand-flexibility-and-demand-side-management"),
     "gerc": ("Mercom: GERC seeks consultants to draft ancillary services and demand flexibility rules (Gujarat)", "https://mercomindia.com/gerc-seeks-consultants-to-finalize-ancillary-services-regulations"),
     "tata": ("Tata Power with AutoGrid: Mumbai demand-response programme (200 MW target)", "https://www.tatapower.com/news-and-media/media-releases/tata-power-joins-hands-with-autogrid-to-expand-ai-enabled-smart-energy-management-system-in-mumbai"),
-    "mercc": ("MERC: DF-DSM Consultation Committee notification (17 Jan 2025)", "https://merc.gov.in/wp-content/uploads/2025/01/DF-DSM-CC_-Notification-_17.01.2025.pdf"),
-    "mercm": ("MERC: minutes of the committee's first meeting", "https://merc.gov.in/wp-content/uploads/2025/04/1st-Minutes-of-the-Meeting-DF-DSM-CC-1.pdf"),
+        "mercm": ("MERC: minutes and programme papers of the DF-DSM Coordination Committee's first meeting (21 Feb 2025)", "https://merc.gov.in/wp-content/uploads/2025/04/1st-Minutes-of-the-Meeting-DF-DSM-CC-1.pdf"),
     "gridpulse": ("Grid Pulse", "https://beckn.vercel.app"),
 }
 
@@ -82,14 +81,14 @@ SLIDE_DEFS = [
         Ref("Read through the full DEG proposal and protocol docs. It's an open protocol (not a product), written by FIDE and IEA", "deg"),
         Ref("Looked into India Energy Stack (IES), the government programme behind this — found it already has live pilots running: 4 DISCOMs, plus a real trade between Meerut and Delhi shown at a national summit", "ies_pilot", "rec_demo"),
         Ref("Went through IES's 8 listed use cases — 5 were already taken, so picked UC3 (Policy as Code / Tariff Intelligence), one of the open ones", "ies_uc"),
-        Ref("Found UC3's schema was still marked work in progress, with known gaps around signatures, currency, and how amendments work", "uc3"),
+        Ref("Found UC3's guide still marked work in progress, with open items such as the amendment convention and further policy types", "uc3"),
         "Built a first prototype: signed tariff data plus two separate billing calculators (one in JS, one in Python) that matched exactly across 4 test cases",
         "Sent a real message through IES's own test network and confirmed it reached other live participants",
     ], ["deg", "ies_pilot", "rec_demo", "ies_uc", "uc3"]),
 
     ("CW – 36", "V2G Researched; Real Network Identity Built", None, [
-        Ref("Dug into V2G — the general mechanism exists, but no one has actually built a V2G-specific example anywhere yet", "devkits"),
-        Ref("Checked the market: major suppliers already sell bidirectional EV-charging hardware, and from Jan 2027 the EU requires the bidirectional-capable charging standard (ISO 15118-20) on new chargers", "bosch", "afir", "charin"),
+        Ref("Dug into V2G — the general mechanism exists, but the DEG devkits have no V2G-specific example yet", "devkits"),
+        Ref("Checked the market: suppliers such as Bosch already offer charging-communication units with ISO 15118-20 and bidirectional options, and from Jan 2027 the EU requires ISO 15118-20 on new chargers", "bosch", "afir", "charin"),
         "Registered a real, independently verifiable identity on the live network — own domain, real keypairs, went through the official process",
         "Ran into a few real obstacles along the way — a domain-verification restriction, a broken redirect, a signing-scheme mismatch I had to resolve by reading the actual source code — and got past all of them",
         "Tested the identity with a signed self-test: a valid message was accepted, a tampered one was rejected",
@@ -146,16 +145,16 @@ SLIDE_DEFS = [
 
     ("CW – 43", "Checked the Market Reality for P2P Trading",
      "Verified what is really live in P2P trading today, then looked at the wider aggregation market.", [
-        Ref("Mapped the real worldwide P2P trading market and checked it against live sources — direct P2P already runs in India, with six DISCOM-accredited apps", "brpl", "tpddl", "evr", "rec_demo"),
+        Ref("Mapped the real worldwide P2P trading market and checked it against live sources — direct P2P already runs in Delhi as a pilot, with six trading apps listed by BSES and more than a dozen platform providers listed by Tata Power-DDL", "brpl", "tpddl", "evr", "rec_demo"),
         "Looked beyond direct P2P at the wider aggregation market — demand response, battery and solar virtual power plants, EV-fleet flexibility and farm-load shifting — to see what is still undone in India",
     ], ["brpl", "tpddl", "evr", "rec_demo"]),
 
     ("CW – 44 (ongoing)", "Mapped India's Aggregation Gap",
      "Mapped where demand-flexibility aggregation really stands across India.", [
         Ref("Researched demand flexibility across India — only three states have real rules (Maharashtra, Rajasthan, Karnataka), Gujarat is still drafting, and no aggregator is registered anywhere yet", "merc", "rerc", "kerc", "gerc"),
-        Ref("The largest pilot found is about 38 MW against a 200 MW target, and no open market exists yet", "tata"),
-        Ref("Found one concrete entry point: a “Special Invitee” seat on Maharashtra's demand-flexibility committee", "mercc", "mercm"),
-    ], ["merc", "rerc", "kerc", "gerc", "tata", "mercc", "mercm"]),
+        Ref("Tata Power's Mumbai demand-response programme with AutoGrid was announced at 75 MW in its first six months, scaling to 200 MW by summer 2025", "tata"),
+        Ref("Maharashtra's committee papers put MSEDCL's flexible-demand target at about 387 MW (1.5% of its 25,840 MW peak) and outline a 500 MWh home-battery programme for 70,000 homes, to be run by an aggregator chosen through a tender", "mercm"),
+    ], ["merc", "rerc", "kerc", "gerc", "tata", "mercm"]),
 ]
 
 # ---------------------------------------------------------------------------------------------
