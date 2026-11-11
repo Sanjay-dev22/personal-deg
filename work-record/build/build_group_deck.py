@@ -55,6 +55,12 @@ SOURCES = {
     "tata": ("Tata Power with AutoGrid: Mumbai demand-response programme (200 MW target)", "https://www.tatapower.com/news-and-media/media-releases/tata-power-joins-hands-with-autogrid-to-expand-ai-enabled-smart-energy-management-system-in-mumbai"),
         "mercm": ("MERC: minutes and programme papers of the DF-DSM Coordination Committee's first meeting (21 Feb 2025)", "https://merc.gov.in/wp-content/uploads/2025/04/1st-Minutes-of-the-Meeting-DF-DSM-CC-1.pdf"),
     "gridpulse": ("Grid Pulse", "https://beckn.vercel.app"),
+    "ies_docs": ("India Energy Stack: technical documentation", "https://india-energy-stack.gitbook.io/docs"),
+    "ies_schemas": ("India Energy Stack: schemas overview", "https://india-energy-stack.gitbook.io/docs/schemas-overview/schemas-overview"),
+    "nfh001": ("Beckn v2 architecture RFC (NFH-001)", "https://github.com/beckn/protocol-specifications-v2/blob/draft/docs/Introduction.md"),
+    "brpl_eoi": ("BSES Delhi (BRPL): open tenders, demand-response aggregator EOI (NIT 1372) with corrigenda and pre-bid replies", "https://www.bsesdelhi.com/web/brpl/open-tenders"),
+    "mop_evci": ("Ministry of Power: EV Charging Infrastructure Guidelines, 17 Sep 2024 (Internet Archive copy of the BEE-hosted PDF)", "https://web.archive.org/web/20251206085440/https://beeindia.gov.in/sites/default/files/Guidelines%20and%20Standards%20for%20EVCI%20dated%2017-09-2024_compressed.pdf"),
+    "cea_v2g": ("CEA: Electric Vehicles Utilization for V2G Services, 2023 (Internet Archive copy)", "https://web.archive.org/web/20250501075854/https://cea.nic.in/wp-content/uploads/gm_and_npc/2023/11/Report_on_V2G.pdf"),
 }
 
 
@@ -149,12 +155,31 @@ SLIDE_DEFS = [
         "Looked beyond direct P2P at the wider aggregation market — demand response, battery and solar virtual power plants, EV-fleet flexibility and farm-load shifting — to see what is still undone in India",
     ], ["brpl", "tpddl", "evr", "rec_demo"]),
 
-    ("CW – 44 (ongoing)", "Mapped India's Aggregation Gap",
+    ("CW – 44", "Mapped India's Aggregation Gap",
      "Mapped where demand-flexibility aggregation really stands across India.", [
         Ref("Researched demand flexibility across India — only three states have real rules (Maharashtra, Rajasthan, Karnataka), Gujarat is still drafting, and no aggregator is registered anywhere yet", "merc", "rerc", "kerc", "gerc"),
         Ref("Tata Power's Mumbai demand-response programme with AutoGrid was announced at 75 MW in its first six months, scaling to 200 MW by summer 2025", "tata"),
         Ref("Maharashtra's committee papers put MSEDCL's flexible-demand target at about 387 MW (1.5% of its 25,840 MW peak) and outline a 500 MWh home-battery programme for 70,000 homes, to be run by an aggregator chosen through a tender", "mercm"),
     ], ["merc", "rerc", "kerc", "gerc", "tata", "mercm"]),
+
+    ("CW – 45", "Checked the V2G Gap and Tested the Missing Pieces",
+     "Mapped what exists for vehicle-to-grid in DEG, IES and India, then tested what is missing on the live signed network.", [
+        Ref("Checked V2G in DEG and IES: it exists only as field names (an EV_V2G charger type and a V2G delivery mode). The demand-flex devkit already handles EV chargers as flexible load, but no V2G example exists", "devkits"),
+        Ref("Read BRPL's demand-response aggregator tender in full: 0.5–1 MW per aggregator, paid for reduction against a baseline, with V2G only an optional later-phase entry (Apr–Aug 2027)", "brpl_eoi"),
+        Ref("Read the Ministry of Power EV charging guidelines (Sep 2024) and the CEA V2G report: V2G is left to each distribution licensee and state regulator, and rules for exporting from many EVs are still missing", "mop_evci", "cea_v2g"),
+        "Tested on the live signed network: exported energy already settles correctly (₹436.25, same as the matching reduction). Found a double count when a meter and its charger sub-meter are both enrolled (₹87.50 paid against a true ₹37.50), then fixed it and re-tested (18 of 18 policy tests, and live)",
+        "Simulated a 25-vehicle depot (assumption-based): a controller can commit about twice the export of a fixed plan, and a recovery cap makes charging straight after an event cost ₹506 against ₹785 when spread out",
+    ], ["devkits", "brpl_eoi", "mop_evci", "cea_v2g"]),
+
+    ("CW – 45", "Studied DEG, Beckn and IES End to End and Documented It",
+     "Went back to the primary documents and wrote up one complete, step-by-step understanding of all three.", [
+        Ref("Read the Digital Energy Grid vision paper in full: the three flows (energy, information, transactions), the infrastructure approach modelled on UPI, and the three building blocks (identity, machine-readable data, verifiability)", "deg"),
+        Ref("Read the India Energy Stack documentation: the Register, Discover and Exchange model, the three networks, the two ways data moves (organisation to organisation, and personal credentials), and how an adapter is built", "ies_docs"),
+        Ref("Went through every IES use-case guide, core and draft, and the published schemas, including the credential, meter-data, ARR filing and outage-notification schemas", "ies_uc", "ies_schemas"),
+        Ref("Studied the Beckn protocol piece by piece: catalog discovery, the request and callback messages, the message envelope, signed messages, the contract object, and policy as code", "nfh001"),
+        Ref("Mapped how peer-to-peer trading works today, including the Delhi regulator's 2026 pilot order, read in full", "derc"),
+        "Wrote it all up as one guide, with 14 sequence diagrams, so that someone new can follow it from the basics through to P2P trading, aggregation and V2G",
+    ], ["deg", "ies_docs", "ies_uc", "ies_schemas", "nfh001", "derc"]),
 ]
 
 # ---------------------------------------------------------------------------------------------
@@ -318,10 +343,41 @@ def write_rels(path, links):
     open(path, "w", encoding="utf-8", newline="").write(rels)
 
 
+def ensure_slide_parts(root, last_page):
+    """The template package holds a fixed number of slide parts. When SLIDE_DEFS has more weeks than that,
+    register extra slideN.xml parts (content types, presentation rels, slide id list) so a new week just works."""
+    slides_dir = os.path.join(root, "ppt", "slides")
+    ct_path = os.path.join(root, "[Content_Types].xml")
+    prs_path = os.path.join(root, "ppt", "presentation.xml")
+    prels_path = os.path.join(root, "ppt", "_rels", "presentation.xml.rels")
+    LAYOUT = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+              '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+              '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout" '
+              'Target="../slideLayouts/slideLayout7.xml"/></Relationships>')
+    for page in range(2, last_page + 1):
+        fname = f"slide{page}.xml"
+        if os.path.exists(os.path.join(slides_dir, fname)):
+            continue
+        open(os.path.join(slides_dir, fname), "w", encoding="utf-8").write("<placeholder/>")
+        open(os.path.join(slides_dir, "_rels", fname + ".rels"), "w", encoding="utf-8").write(LAYOUT)
+        ct = open(ct_path, encoding="utf-8").read()
+        ct = ct.replace("</Types>", f'<Override PartName="/ppt/slides/{fname}" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/></Types>')
+        open(ct_path, "w", encoding="utf-8").write(ct)
+        pr = open(prels_path, encoding="utf-8").read()
+        rid = max(int(m) for m in re.findall(r'Id="rId(\d+)"', pr)) + 1
+        pr = pr.replace("</Relationships>", f'<Relationship Id="rId{rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/{fname}"/></Relationships>')
+        open(prels_path, "w", encoding="utf-8").write(pr)
+        px = open(prs_path, encoding="utf-8").read()
+        sid = max(int(m) for m in re.findall(r'<p:sldId id="(\d+)"', px)) + 1
+        px = px.replace("</p:sldIdLst>", f'<p:sldId id="{sid}" r:id="rId{rid}"/></p:sldIdLst>')
+        open(prs_path, "w", encoding="utf-8").write(px)
+
+
 def main():
     work = tempfile.mkdtemp(prefix="deckbuild_")
     root = os.path.join(work, "pkg")
     shutil.copytree(TEMPLATE, root)
+    ensure_slide_parts(root, len(SLIDE_DEFS) + 1)
     slides_dir = os.path.join(root, "ppt", "slides")
     problems = []
     for page, (kicker, title, sub, bullets, keys) in enumerate(SLIDE_DEFS, start=2):
